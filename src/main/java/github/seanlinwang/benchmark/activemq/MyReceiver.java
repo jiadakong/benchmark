@@ -1,4 +1,4 @@
-package github.seanlinwang.bentchmark.activemq;
+package github.seanlinwang.benchmark.activemq;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;

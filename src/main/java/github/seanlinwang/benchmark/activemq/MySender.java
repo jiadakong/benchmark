@@ -1,8 +1,12 @@
-package github.seanlinwang.bentchmark.activemq;
+package github.seanlinwang.benchmark.activemq;
+
+import github.seanlinwang.benchmark.util.Format;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.util.Calendar;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -11,6 +15,7 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
@@ -24,6 +29,8 @@ public class MySender implements Runnable {
 	private JmsTemplate template;
 	private Destination destination;
 	private String[] resultSet;
+	private DateFormat dateFormat = Format.getDateFormat();
+	private Calendar cal = Format.getCalendar();
 
 	public MySender(int times) {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("/applicationContext.xml");
@@ -48,14 +55,14 @@ public class MySender implements Runnable {
 				}
 			});
 			long end = System.currentTimeMillis();
-			resultSet[i] = ((end - now) + "," + end / 1000);
+			resultSet[i] = ((end - now) + "," + end);
 		}
 	}
 
 	public static void main(String[] args) throws JMSException, IOException, InterruptedException {
-		MySender[] senders = new MySender[20];
+		MySender[] senders = new MySender[5];
 		for (int i = 0; i < senders.length; i++) {
-			senders[i] = new MySender(1000);
+			senders[i] = new MySender(10000);
 		}
 		Thread[] ts = new Thread[senders.length];
 		for (int i = 0; i < senders.length; i++) {
@@ -68,7 +75,7 @@ public class MySender implements Runnable {
 			ts[i].join();
 		}
 
-		FileWriter outFile = new FileWriter("C:\\Users\\Yao\\Documents\\mq-sender-test.csv");
+		FileWriter outFile = new FileWriter("/Users/alin/Documents/workspace/logs/benchmark/activemq.csv");
 		PrintWriter out = new PrintWriter(outFile);
 
 		for (int i = 0; i < senders.length; i++) {
@@ -82,8 +89,11 @@ public class MySender implements Runnable {
 
 	private void print(PrintWriter out2) {
 		for (String line : resultSet) {
-			out2.write(line + "\n");
+			String[] segs = StringUtils.split(line, ',');
+			out2.write(segs[0]);
+			out2.write(",");
+			this.cal.setTimeInMillis(Long.valueOf(segs[1]));
+			out2.write(this.dateFormat.format(cal.getTime()) + "\n");
 		}
 	}
-
 }
