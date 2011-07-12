@@ -13,7 +13,10 @@ import javax.jms.JMSException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Delete;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -30,10 +33,10 @@ public class HBasePut extends BenchmarkBase {
 	private String rowPrefix;
 	private PrintWriter out;
 
-	public HBasePut(PrintWriter out, String rowPrefix, int times) throws IOException {
+	public HBasePut(PrintWriter out, String tableName, String rowPrefix, int times) throws IOException {
 		this.rowPrefix = rowPrefix;
 		Configuration conf = (Configuration) HBaseConfiguration.create();
-		this.table = new HTable(conf, "test_table");
+		this.table = new HTable(conf, tableName);
 		this.resultSet = new String[times];
 		this.out = out;
 	}
@@ -78,9 +81,22 @@ public class HBasePut extends BenchmarkBase {
 
 	public static void main(String[] args) throws JMSException, IOException, InterruptedException {
 		PrintWriter out = BenchmarkBase.createOutput("hbase-put.csv");
-		HBasePut[] senders = new HBasePut[5];
+
+		Configuration config = HBaseConfiguration.create();
+		HBaseAdmin admin = new HBaseAdmin(config);
+		String table = "benchmark_put";
+		HTableDescriptor htable = new HTableDescriptor(table);
+		HColumnDescriptor cf1 = new HColumnDescriptor("cf");
+		htable.addFamily(cf1); // adding new ColumnFamily
+		admin.createTable(htable);
+		while (!admin.isTableAvailable(table)) {
+			Thread.sleep(500);
+		}
+		System.out.println("create table:" + table);
+
+		HBasePut[] senders = new HBasePut[4];
 		for (int i = 0; i < senders.length; i++) {
-			senders[i] = new HBasePut(out, "test_row" + i + "-", 10000);
+			senders[i] = new HBasePut(out, table, "test_row" + i + "-", 10000);
 		}
 		Thread[] ts = new Thread[senders.length];
 		for (int i = 0; i < senders.length; i++) {
@@ -99,6 +115,13 @@ public class HBasePut extends BenchmarkBase {
 			sender.deleteTestData();
 		}
 
+		admin.disableTable(table);
+		admin.deleteTable(table);
+		while (admin.isTableAvailable(table)) {
+			Thread.sleep(500);
+		}
+		System.out.println("delete table:" + table);
+		
 		out.close();
 	}
 
