@@ -29,9 +29,10 @@ public class HBasePut extends BenchmarkBase {
 	private String[] resultSet;
 	private DateFormat dateFormat = Format.getDateFormat();
 	private Calendar cal = Format.getCalendar();
+	private PrintWriter out;
+
 	private HTable table;
 	private String rowPrefix;
-	private PrintWriter out;
 
 	public HBasePut(PrintWriter out, String tableName, String rowPrefix, int times) throws IOException {
 		this.rowPrefix = rowPrefix;
@@ -121,7 +122,7 @@ public class HBasePut extends BenchmarkBase {
 			Thread.sleep(500);
 		}
 		System.out.println("delete table:" + table);
-		
+
 		out.close();
 	}
 
