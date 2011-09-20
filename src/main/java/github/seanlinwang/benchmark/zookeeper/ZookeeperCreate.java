@@ -86,8 +86,9 @@ public class ZookeeperCreate extends BenchmarkBase {
 		ZooKeeper zk = new ZooKeeper("localhost:" + CLIENT_PORT, CONNECTION_TIMEOUT, new Watcher() {
 			@Override
 			public void process(WatchedEvent event) {
-				
-			} });
+
+			}
+		});
 
 		ZookeeperCreate[] senders = new ZookeeperCreate[10];
 		for (int i = 0; i < senders.length; i++) {
