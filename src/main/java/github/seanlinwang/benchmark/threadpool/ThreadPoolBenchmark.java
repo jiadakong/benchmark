@@ -35,7 +35,7 @@ public class ThreadPoolBenchmark {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		ThreadPoolExecutor executor = new ThreadPoolExecutor(20, 1000, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
+		ThreadPoolExecutor executor = new ThreadPoolExecutor(200, 2000, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(500));
 		final Random r = new Random();
 		AtomicInteger rejectCount = new AtomicInteger();
 		AtomicLong activeCount = new AtomicLong();
@@ -62,7 +62,7 @@ public class ThreadPoolBenchmark {
 			pollSize.addAndGet(executor.getPoolSize());
 			// System.out.println(String.format("reject:%s,size:%s,active:%s,largestSize:%s,taskCount%s", rejectCount.get(), executor.getPoolSize(), executor.getActiveCount(), executor.getLargestPoolSize(), executor.getTaskCount()));
 		}
-		System.out.println(String.format("total reject count:%s, average active count:%s, average pool size:%s average active ratio:%s", rejectCount.get(), activeCount.get() * 1.0 / times, pollSize.get() * 1.0 / times, activeCount.get() * 1.0 / pollSize.get()));
+		System.out.println(String.format("total reject count:%s, average active count:%s, average pool size:%s, average active ratio:%s", rejectCount.get(), activeCount.get() * 1.0 / times, pollSize.get() * 1.0 / times, activeCount.get() * 1.0 / pollSize.get()));
 
 	}
 }

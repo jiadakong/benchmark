@@ -8,6 +8,20 @@
 	<packaging>jar</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<name>cloud service benchmark</name>
+	<repositories>
+		<!--<repository> <id>nuxeo-jms</id> <url>http://svn.nuxeo.org/maven/repo</url> 
+			</repository> -->
+		<repository>
+			<id>thift-hadoop</id>
+			<url>http://people.apache.org/~rawson/repo</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 			<plugin>
@@ -118,12 +132,7 @@
 			</resource>
 		</resources>
 	</build>
-	<repositories>
-		<repository>
-			<id>nuxeo</id><!-- for jms -->
-			<url>http://svn.nuxeo.org/maven/repo</url>
-		</repository>
-	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -156,24 +165,29 @@
 			<version>3.0.5.RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.jms</groupId>
-			<artifactId>jms</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-spring</artifactId>
-			<version>5.5.0</version>
+			<version>5.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hbase</groupId>
 			<artifactId>hbase</artifactId>
-			<version>0.90.3</version>
+			<version>0.94.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-core</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>3.2.7.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>
 			<artifactId>zookeeper</artifactId>
-			<version>3.3.3</version>
+			<version>3.4.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -182,5 +196,10 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.5</version>
+		</dependency>
 	</dependencies>
 </project>
