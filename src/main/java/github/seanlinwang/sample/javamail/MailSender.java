@@ -1,8 +1,15 @@
 package github.seanlinwang.sample.javamail;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.Security;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -15,6 +22,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
 *
@@ -31,12 +40,8 @@ public class MailSender {
 	 */
 	public void sendTextMail(MailInfo mailInfo) throws MessagingException {
 
-		MyAuthenticator authenticator = null;
+		MyAuthenticator authenticator = mailInfo.getAuthenticator();
 		Properties pro = mailInfo.getProperties();
-		if (mailInfo.isValidate()) {
-
-			authenticator = new MyAuthenticator(mailInfo.getUserName(), mailInfo.getPassword());
-		}
 
 		Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
 		Message mailMessage = new MimeMessage(sendMailSession);
@@ -64,14 +69,10 @@ public class MailSender {
 	 */
 	public static void sendHtmlMail(MailInfo mailInfo) throws MessagingException {
 
-		MyAuthenticator authenticator = null;
-		Properties pro = mailInfo.getProperties();
-		// 锟斤拷锟斤拷锟揭拷锟斤拷锟斤拷证锟斤拷锟津创斤拷一锟斤拷锟斤拷锟斤拷锟斤拷证锟斤拷
-		if (mailInfo.isValidate()) {
-			authenticator = new MyAuthenticator(mailInfo.getUserName(), mailInfo.getPassword());
-		}
+		MyAuthenticator authenticator = mailInfo.getAuthenticator();
+		Properties props = mailInfo.getProperties();
 
-		Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
+		Session sendMailSession = Session.getDefaultInstance(props, authenticator);
 
 		Message mailMessage = new MimeMessage(sendMailSession);
 
@@ -99,19 +100,74 @@ public class MailSender {
 		Transport.send(mailMessage);
 	}
 
-	public static void main(String[] args) throws MessagingException {
-		MailInfo mailInfo = new MailInfo();
-		mailInfo.setMailServerHost("smtp.yeah.net");
-		mailInfo.setMailServerPort(25);
-		// mailInfo.setValidate(true);
-		// mailInfo.setSsl(true);
-		mailInfo.setUserName("wwwqcomcn@yeah.net");
-		mailInfo.setPassword("qcomcn");
-		mailInfo.setFromAddress("wwwqcomcn@yeah.net");
-		mailInfo.setToAddress("wangjing4j@sina.com");
-		mailInfo.setSubject("测试");
-		mailInfo.setContent("来自iceball1@163.com的邮件,密码为123456<img id='authimg'  src='http://www.163.com/img/baidu_sylogo1.gif' />");
-		// sms.sendTextMail(mailInfo);
-		MailSender.sendHtmlMail(mailInfo);
+	public static void main(String[] args) throws MessagingException, IOException {
+		Set<String> set = getEmailAdress();
+
+		Set<String> setIgnore = getEmailIgnores();
+
+		System.out.println("total address\t" + set.size());
+		System.out.println("ignore address\t" + setIgnore.size());
+
+		int i = 1;
+		for (String toAddress : set) {
+			if (setIgnore.contains(toAddress)) {
+				System.out.println("ignore\t" + toAddress);
+				continue;
+			}
+			try {
+				MailInfo mailInfo = new MailInfo();
+				mailInfo.setMailServerHost("smtp.gmail.com");
+				mailInfo.setMailServerPort(587);
+				mailInfo.setUsername("xxxxx");
+				mailInfo.setPassword("xxxx");
+				mailInfo.setFromAddress("xxxxx");
+				mailInfo.setToAddress(toAddress);
+				mailInfo.setSubject("xxxx");
+				mailInfo.setContent("xxxxx");
+				MailSender.sendHtmlMail(mailInfo);
+
+				System.out.println(i + "\t" + toAddress + "\t" + new Date());
+				i++;
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+
+	}
+
+	private static Set<String> getEmailIgnores() throws IOException {
+		Set<String> setIgnore = new HashSet<String>();
+		FileInputStream ignoreinput = new FileInputStream("xxx.csv");
+		DataInputStream ignoreIn = new DataInputStream(ignoreinput);
+		BufferedReader ingnoreBr = new BufferedReader(new InputStreamReader(ignoreIn));
+		// Read File Line By Line
+		String strLine = null;
+		while ((strLine = ingnoreBr.readLine()) != null) {
+			setIgnore.add(StringUtils.trim(strLine));
+		}
+		return setIgnore;
+	}
+
+	private static Set<String> getEmailAdress() throws IOException {
+		Set<String> set = new HashSet<String>();
+		FileInputStream fstream = new FileInputStream("/xxx.csv");
+		// Get the object of DataInputStream
+		DataInputStream in = new DataInputStream(fstream);
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		String strLine;
+		// Read File Line By Line
+		while ((strLine = br.readLine()) != null) {
+
+			String[] segs = StringUtils.split(strLine, ',');
+			if (segs == null || segs.length < 3) {
+				continue;
+			}
+			String email = StringUtils.trimToNull(segs[2]);
+			if (email == null || !email.contains("@")) {
+				continue;
+			}
+			set.add(StringUtils.trim(email));
+		}
+		return set;
 	}
 }

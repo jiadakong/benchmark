@@ -11,7 +11,8 @@ public class MailInfo {
 
 	private String toAddress;
 
-	private String userName;
+	private String username;
+
 	private String password;
 
 	private boolean validate = true;
@@ -24,24 +25,30 @@ public class MailInfo {
 
 	private String[] attachFileNames;
 
-	private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
-
 	/**
       *
       */
 	public Properties getProperties() {
-		Properties p = new Properties();
-		if (ssl) {
-			p.put("mail.smtp.socketFactory.class", SSL_FACTORY);
-			p.put("mail.smtp.socketFactory.fallback", "false");
-			p.put("mail.smtp.socketFactory.port", "" + this.mailServerPort);
-		} else {
-			p.put("mail.smtp.port", "" + this.mailServerPort);
-		}
-		p.put("mail.smtp.host", this.mailServerHost);
-
-		p.put("mail.smtp.auth", validate ? "true" : "false");
-		return p;
+		// Properties p = new Properties();
+		// if (ssl) {
+		// p.put("mail.smtp.socketFactory.class", SSL_FACTORY);
+		// p.put("mail.smtp.socketFactory.fallback", "false");
+		// p.put("mail.smtp.socketFactory.port", "" + this.mailServerPort);
+		// } else {
+		// p.put("mail.smtp.port", "" + this.mailServerPort);
+		// }
+		// p.put("mail.smtp.host", this.mailServerHost);
+		//
+		// p.put("mail.smtp.auth", validate ? "true" : "false");
+		// return p;
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.setProperty("mail.smtp.connectiontimeout", "30000");
+		props.setProperty("mail.smtp.timeout", "30000");
+		props.put("mail.smtp.host", this.mailServerHost);
+		props.put("mail.smtp.port", this.mailServerPort);
+		return props;
 	}
 
 	public String getMailServerHost() {
@@ -108,12 +115,12 @@ public class MailInfo {
 		this.toAddress = toAddress;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String userName) {
+		this.username = userName;
 	}
 
 	public String getSubject() {
@@ -130,6 +137,10 @@ public class MailInfo {
 
 	public void setContent(String textContent) {
 		this.content = textContent;
+	}
+
+	public MyAuthenticator getAuthenticator() {
+		return new MyAuthenticator(this.username, this.getPassword());
 	}
 
 }
