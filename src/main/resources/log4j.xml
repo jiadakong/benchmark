@@ -8,7 +8,7 @@
 		</layout>
 	</appender>
 	<root>
-		<level value="DEBUG" />
+		<level value="info" />
 		<appender-ref ref="PROJECT" />
 	</root>
 </log4j:configuration>
